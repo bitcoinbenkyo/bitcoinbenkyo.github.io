@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bitcoin Benkyo — ビットコイン勉強</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@400;700;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --orange:      #F7931A;
+      --orange-lite: #FFB347;
+      --orange-dark: #d4780f;
+      --cream:       #FFF8EE;
+      --ink:         #111008;
+      --ink-soft:    #2a2210;
+      --muted:       #8a7d68;
+      --white:       #ffffff;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--cream);
+      color: var(--ink);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+      cursor: none;
+    }
+    .cursor {
+      position: fixed;
+      width: 18px; height: 18px;
+      background: var(--orange);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: width 0.2s ease, height 0.2s ease, background 0.2s ease;
+      mix-blend-mode: multiply;
+    }
+    .cursor.big { width: 48px; height: 48px; background: var(--orange-lite); }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 48px;
+      background: var(--cream);
+      border-bottom: 2px solid var(--ink);
+    }
+    .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav-b {
+      width: 38px; height: 38px; background: var(--orange);
+      border-radius: 50%; border: 2px solid var(--ink);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: var(--ink);
+      box-shadow: 3px 3px 0 var(--ink); transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .nav-b:hover { transform: translate(-2px,-2px); box-shadow: 5px 5px 0 var(--ink); }
+    .nav-wordmark { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 0.06em; color: var(--ink); }
+    .nav-wordmark span { color: var(--orange); }
+    .nav-jp { font-family: 'Noto Sans JP', sans-serif; font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: 0.08em; display: block; line-height: 1; }
+    .nav-right { display: flex; align-items: center; gap: 16px; }
+    .nav-link { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--muted); text-decoration: none; letter-spacing: 0.05em; transition: color 0.2s; }
+    .nav-link:hover { color: var(--orange); }
+    .nav-cta {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--ink); color: var(--cream);
+      font-family: 'Bebas Neue', sans-serif; font-size: 15px; letter-spacing: 0.08em;
+      padding: 10px 20px; border-radius: 4px; text-decoration: none;
+      border: 2px solid var(--ink); box-shadow: 3px 3px 0 var(--orange); transition: all 0.15s;
+    }
+    .nav-cta:hover { background: var(--orange); color: var(--ink); box-shadow: 3px 3px 0 var(--ink); transform: translate(-1px,-1px); }
+    .nav-cta svg { width: 13px; height: 13px; fill: currentColor; }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh; padding: 120px 48px 80px;
+      display: grid; grid-template-columns: 1fr 1fr;
+      align-items: center; position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: ''; position: absolute; top: -10%; right: -5%;
+      width: 55%; height: 120%;
+      background: var(--orange); transform: skewX(-4deg); z-index: 0;
+    }
+    .hero-left { position: relative; z-index: 2; }
+    .hero-tag {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--ink); color: var(--cream);
+      font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.15em;
+      padding: 6px 14px; border-radius: 100px; margin-bottom: 28px;
+      opacity: 0; animation: popIn 0.5s cubic-bezier(0.34,1.56,0.64,1) 0.2s forwards;
+    }
+    .hero-tag-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--orange); animation: blink 2s infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+    .hero-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(72px, 10vw, 130px); line-height: 0.88;
+      color: var(--ink); opacity: 0;
+      animation: slideRight 0.7s cubic-bezier(0.16,1,0.3,1) 0.3s forwards;
+    }
+    .hero-title .line-orange { color: var(--orange-dark); display: block; }
+    .hero-jp-big {
+      font-family: 'Noto Sans JP', sans-serif; font-weight: 900;
+      font-size: clamp(18px, 2.5vw, 26px); color: var(--ink-soft); letter-spacing: 0.12em;
+      margin-top: 12px; opacity: 0;
+      animation: slideRight 0.7s cubic-bezier(0.16,1,0.3,1) 0.45s forwards;
+    }
+    .hero-sub {
+      font-size: clamp(14px, 1.5vw, 16px); font-weight: 400;
+      color: var(--ink-soft); line-height: 1.7; max-width: 420px; margin-top: 24px;
+      opacity: 0; animation: slideRight 0.7s cubic-bezier(0.16,1,0.3,1) 0.55s forwards;
+    }
+    .hero-sub em { font-style: normal; font-family: 'Noto Sans JP', sans-serif; font-size: 13px; color: var(--muted); display: block; margin-top: 4px; }
+    .hero-btns { display: flex; gap: 14px; margin-top: 36px; flex-wrap: wrap; opacity: 0; animation: slideRight 0.7s cubic-bezier(0.16,1,0.3,1) 0.65s forwards; }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--ink); color: var(--cream);
+      font-family: 'Bebas Neue', sans-serif; font-size: 17px; letter-spacing: 0.08em;
+      padding: 14px 28px; border-radius: 6px; text-decoration: none;
+      border: 2px solid var(--ink); box-shadow: 4px 4px 0 var(--orange); transition: all 0.15s;
+    }
+    .btn-primary:hover { transform: translate(-2px,-2px); box-shadow: 6px 6px 0 var(--orange); }
+    .btn-secondary {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: transparent; color: var(--ink);
+      font-family: 'Bebas Neue', sans-serif; font-size: 17px; letter-spacing: 0.08em;
+      padding: 14px 28px; border-radius: 6px; text-decoration: none;
+      border: 2px solid var(--ink); box-shadow: 4px 4px 0 var(--ink); transition: all 0.15s;
+    }
+    .btn-secondary:hover { transform: translate(-2px,-2px); box-shadow: 6px 6px 0 var(--ink); background: var(--orange-lite); }
+
+    /* HERO RIGHT — character images */
+    .hero-right {
+      position: relative; z-index: 2;
+      display: flex; align-items: center; justify-content: center;
+      height: 100%; padding: 40px 0 40px 40px;
+    }
+    .char-img-stack { position: relative; width: 300px; height: 400px; }
+    .char-img-card {
+      position: absolute;
+      border: 3px solid var(--ink); border-radius: 16px;
+      overflow: hidden; box-shadow: 6px 6px 0 var(--ink);
+    }
+    .char-img-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .char-img-card.mina-card {
+      width: 230px; height: 280px; top: 0; left: 0;
+      transform: rotate(-4deg);
+      animation: floatA 5s ease-in-out infinite;
+    }
+    .char-img-card.sato-card {
+      width: 200px; height: 240px; bottom: 0; right: 0;
+      transform: rotate(3deg);
+      animation: floatB 5s ease-in-out 1s infinite;
+    }
+    .char-img-label {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: var(--ink); color: var(--cream);
+      font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 0.08em;
+      padding: 8px 12px; display: flex; align-items: center; justify-content: space-between;
+    }
+    .char-img-label-jp { font-family: 'Noto Sans JP', sans-serif; font-size: 10px; font-weight: 700; color: var(--orange); }
+    @keyframes floatA { 0%,100%{ transform: rotate(-4deg) translateY(0); } 50%{ transform: rotate(-4deg) translateY(-10px); } }
+    @keyframes floatB { 0%,100%{ transform: rotate(3deg) translateY(0); } 50%{ transform: rotate(3deg) translateY(-8px); } }
+    @keyframes popIn { from { opacity:0; transform: scale(0.8); } to { opacity:1; transform: scale(1); } }
+    @keyframes slideRight { from { opacity:0; transform: translateX(-30px); } to { opacity:1; transform: translateX(0); } }
+
+    /* TICKER */
+    .ticker { background: var(--orange); border-top: 2px solid var(--ink); border-bottom: 2px solid var(--ink); overflow: hidden; padding: 12px 0; white-space: nowrap; }
+    .ticker-inner { display: inline-flex; gap: 48px; animation: ticker 18s linear infinite; }
+    .ticker-item { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 0.1em; color: var(--ink); display: flex; align-items: center; gap: 16px; }
+    .ticker-item::after { content: '₿'; opacity: 0.4; }
+    @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    /* CHARACTER PREVIEW SECTION */
+    .chars-preview {
+      padding: 80px 48px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .section-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(36px, 5vw, 60px); letter-spacing: 0.02em; line-height: 1; }
+    .section-title span { color: var(--orange); }
+    .section-jp { font-family: 'Noto Sans JP', sans-serif; font-size: 12px; font-weight: 700; color: var(--muted); letter-spacing: 0.1em; margin-top: 4px; }
+
+    .chars-preview-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 40px;
+    }
+    .preview-card {
+      border: 2px solid var(--ink); border-radius: 16px; overflow: hidden;
+      box-shadow: 5px 5px 0 var(--ink); transition: transform 0.2s, box-shadow 0.2s;
+      text-decoration: none; color: inherit;
+      display: block;
+    }
+    .preview-card:hover { transform: translate(-3px,-3px); box-shadow: 8px 8px 0 var(--orange); }
+    .preview-card-img { width: 100%; height: 280px; object-fit: cover; display: block; }
+    .preview-card-body { padding: 20px 24px; background: var(--white); }
+    .preview-card-name { font-family: 'Bebas Neue', sans-serif; font-size: 32px; letter-spacing: 0.05em; }
+    .preview-card-jp { font-family: 'Noto Sans JP', sans-serif; font-size: 12px; font-weight: 700; color: var(--orange); letter-spacing: 0.1em; margin: 4px 0 10px; }
+    .preview-card-desc { font-size: 13px; line-height: 1.7; color: var(--muted); }
+    .preview-card-cta {
+      display: inline-flex; align-items: center; gap: 6px;
+      margin-top: 16px; font-family: 'Bebas Neue', sans-serif;
+      font-size: 15px; letter-spacing: 0.08em; color: var(--orange);
+    }
+    .preview-card-cta::after { content: '→'; }
+
+    /* VIDEO */
+    .section { padding: 80px 48px; max-width: 1100px; margin: 0 auto; }
+    .section-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 32px; flex-wrap: wrap; gap: 16px; }
+    .video-wrap {
+      width: 100%; aspect-ratio: 16/9; background: var(--ink);
+      border: 2px solid var(--ink); border-radius: 16px; overflow: hidden;
+      box-shadow: 8px 8px 0 var(--orange);
+      display: flex; align-items: center; justify-content: center; flex-direction: column;
+      gap: 16px; color: var(--muted); font-family: 'IBM Plex Mono', monospace; font-size: 13px;
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+    .video-wrap:hover { box-shadow: 12px 12px 0 var(--orange); transform: translate(-2px,-2px); }
+    .play-btn { width: 72px; height: 72px; background: var(--orange); border-radius: 50%; border: 2px solid var(--cream); display: flex; align-items: center; justify-content: center; opacity: 0.5; }
+    .play-btn svg { width: 28px; height: 28px; fill: var(--ink); margin-left: 4px; }
+
+    /* CTA BAND */
+    .cta-band {
+      background: var(--orange); border-top: 2px solid var(--ink); border-bottom: 2px solid var(--ink);
+      padding: 64px 48px; display: flex; align-items: center; justify-content: space-between; gap: 32px; flex-wrap: wrap;
+    }
+    .cta-band-left h2 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(36px, 5vw, 64px); letter-spacing: 0.02em; line-height: 1; color: var(--ink); }
+    .cta-band-left p { font-family: 'Noto Sans JP', sans-serif; font-size: 13px; font-weight: 700; color: var(--ink-soft); margin-top: 6px; letter-spacing: 0.08em; opacity: 0.7; }
+    .cta-band-btn {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: var(--ink); color: var(--cream);
+      font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 0.08em;
+      padding: 18px 36px; border-radius: 8px; text-decoration: none;
+      border: 2px solid var(--ink); box-shadow: 5px 5px 0 var(--ink-soft); transition: all 0.15s; white-space: nowrap;
+    }
+    .cta-band-btn:hover { transform: translate(-2px,-2px); box-shadow: 8px 8px 0 var(--ink-soft); }
+    .cta-band-btn svg { width: 18px; height: 18px; fill: currentColor; }
+
+    /* FOOTER */
+    footer { background: var(--ink); padding: 32px 48px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+    .footer-brand { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 0.08em; color: var(--cream); }
+    .footer-brand span { color: var(--orange); }
+    .footer-jp { font-family: 'Noto Sans JP', sans-serif; font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: 0.08em; margin-top: 2px; }
+    .footer-right { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted); letter-spacing: 0.05em; text-align: right; }
+
+    @media (max-width: 768px) {
+      nav { padding: 14px 20px; }
+      .nav-link { display: none; }
+      .hero { grid-template-columns: 1fr; padding: 100px 24px 60px; }
+      .hero::before { display: none; }
+      .hero-right { padding: 40px 0 0; }
+      .chars-preview { padding: 60px 24px; }
+      .chars-preview-grid { grid-template-columns: 1fr; }
+      .section { padding: 60px 24px; }
+      .cta-band { padding: 48px 24px; }
+      footer { padding: 24px 20px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="cursor" id="cursor"></div>
+
+  <nav>
+    <a href="index.html" class="nav-logo">
+      <div class="nav-b">₿</div>
+      <div>
+        <div class="nav-wordmark">Bitcoin <span>Benkyo</span></div>
+        <span class="nav-jp">ビットコイン勉強</span>
+      </div>
+    </a>
+    <div class="nav-right">
+      <a href="characters.html" class="nav-link">Characters</a>
+      <a href="#learn" class="nav-link">Learn</a>
+      <a href="https://twitter.com/bitcoinbenkyou" target="_blank" rel="noopener" class="nav-cta">
+        <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.747l7.73-8.835L1.254 2.25H8.08l4.259 5.63 5.905-5.63z"/></svg>
+        Follow
+      </a>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-left">
+      <div class="hero-tag"><div class="hero-tag-dot"></div>Bitcoin Education · Made Simple</div>
+      <h1 class="hero-title">Bitcoin<span class="line-orange">Benkyo</span></h1>
+      <p class="hero-jp-big">ビットコイン勉強</p>
+      <p class="hero-sub">
+        Two guides. One truth. Bitcoin education through the stories of those who needed it most.
+        <em>物語でビットコインを理解する</em>
+      </p>
+      <div class="hero-btns">
+        <a href="characters.html" class="btn-primary">Meet the Guides</a>
+        <a href="https://twitter.com/bitcoinbenkyou" target="_blank" rel="noopener" class="btn-secondary">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.747l7.73-8.835L1.254 2.25H8.08l4.259 5.63 5.905-5.63z"/></svg>
+          @bitcoinbenkyou
+        </a>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="char-img-stack">
+        <div class="char-img-card mina-card">
+          <img src="mina-hero.png" alt="Mina of Ankoku" />
+          <div class="char-img-label">
+            <span>Mina</span>
+            <span class="char-img-label-jp">暗国のミナ</span>
+          </div>
+        </div>
+        <div class="char-img-card sato-card">
+          <img src="sato-waving.jpg" alt="Sato-san" />
+          <div class="char-img-label">
+            <span>Sato-san</span>
+            <span class="char-img-label-jp">サトウさん</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TICKER -->
+  <div class="ticker">
+    <div class="ticker-inner">
+      <div class="ticker-item">Bitcoin Education</div>
+      <div class="ticker-item">ビットコイン勉強</div>
+      <div class="ticker-item">21 Million</div>
+      <div class="ticker-item">二千百万</div>
+      <div class="ticker-item">Made Simple</div>
+      <div class="ticker-item">わかりやすく</div>
+      <div class="ticker-item">Bitcoin Education</div>
+      <div class="ticker-item">ビットコイン勉強</div>
+      <div class="ticker-item">21 Million</div>
+      <div class="ticker-item">二千百万</div>
+      <div class="ticker-item">Made Simple</div>
+      <div class="ticker-item">わかりやすく</div>
+    </div>
+  </div>
+
+  <!-- CHARACTER PREVIEW -->
+  <div class="chars-preview">
+    <div class="section-title">Meet the <span>Guides</span></div>
+    <div class="section-jp">ガイドたちに会う</div>
+    <div class="chars-preview-grid">
+      <a href="characters.html#mina" class="preview-card">
+        <img src="mina-city.png" alt="Mina of Ankoku" class="preview-card-img" />
+        <div class="preview-card-body">
+          <div class="preview-card-name">Mina of Ankoku</div>
+          <div class="preview-card-jp">暗国のミナ — The Sharp Guide</div>
+          <p class="preview-card-desc">Cool, sharp, analytical. Crossed a border with only 12 words in her head. She already knows Bitcoin is the answer.</p>
+          <div class="preview-card-cta">Read her story</div>
+        </div>
+      </a>
+      <a href="characters.html#sato" class="preview-card">
+        <img src="sato-reading.png" alt="Sato-san" class="preview-card-img" />
+        <div class="preview-card-body">
+          <div class="preview-card-name">Sato-san</div>
+          <div class="preview-card-jp">サトウさん — The Cheerful Guide</div>
+          <p class="preview-card-desc">Warm, friendly, unshakeable. Watched currencies collapse across a dozen countries. Now he teaches what he wished he'd known sooner.</p>
+          <div class="preview-card-cta">Read his story</div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- VIDEO -->
+  <div class="section" id="learn">
+    <div class="section-header">
+      <div>
+        <div class="section-title">Latest <span>Episode</span></div>
+        <div class="section-jp">最新エピソード</div>
+      </div>
+    </div>
+    <div class="video-wrap">
+      <div class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+      <span>動画近日公開 — Video coming soon</span>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-band">
+    <div class="cta-band-left">
+      <h2>Follow the learning.</h2>
+      <p>毎週新しいストーリー — New stories every week</p>
+    </div>
+    <a href="https://twitter.com/bitcoinbenkyou" target="_blank" rel="noopener" class="cta-band-btn">
+      <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.747l7.73-8.835L1.254 2.25H8.08l4.259 5.63 5.905-5.63z"/></svg>
+      Follow @bitcoinbenkyou
+    </a>
+  </div>
+
+  <footer>
+    <div>
+      <div class="footer-brand">Bitcoin <span>Benkyo</span></div>
+      <div class="footer-jp">ビットコイン勉強 · 21,000,000 · Finished. Forever.</div>
+    </div>
+    <div class="footer-right">
+      © 2025 Bitcoin Benkyo<br/>
+      <span style="color:rgba(138,125,104,0.5)">built on truth · 真実の上に</span>
+    </div>
+  </footer>
+
+  <script>
+    const cursor = document.getElementById('cursor');
+    document.addEventListener('mousemove', e => {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top  = e.clientY + 'px';
+    });
+    document.querySelectorAll('a, button').forEach(el => {
+      el.addEventListener('mouseenter', () => cursor.classList.add('big'));
+      el.addEventListener('mouseleave', () => cursor.classList.remove('big'));
+    });
+  </script>
+</body>
+</html>

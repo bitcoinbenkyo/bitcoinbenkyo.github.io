@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Characters — Bitcoin Benkyo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@400;700;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --orange:      #F7931A;
+      --orange-lite: #FFB347;
+      --orange-dark: #d4780f;
+      --cream:       #FFF8EE;
+      --ink:         #111008;
+      --ink-soft:    #2a2210;
+      --muted:       #8a7d68;
+      --white:       #ffffff;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--cream); color: var(--ink); font-family: 'DM Sans', sans-serif; font-weight: 300; overflow-x: hidden; cursor: none; }
+    .cursor { position: fixed; width: 18px; height: 18px; background: var(--orange); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%, -50%); transition: width 0.2s ease, height 0.2s ease, background 0.2s ease; mix-blend-mode: multiply; }
+    .cursor.big { width: 48px; height: 48px; background: var(--orange-lite); }
+
+    /* NAV */
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 18px 48px; background: var(--cream); border-bottom: 2px solid var(--ink); }
+    .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav-b { width: 38px; height: 38px; background: var(--orange); border-radius: 50%; border: 2px solid var(--ink); display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: var(--ink); box-shadow: 3px 3px 0 var(--ink); transition: transform 0.15s, box-shadow 0.15s; }
+    .nav-b:hover { transform: translate(-2px,-2px); box-shadow: 5px 5px 0 var(--ink); }
+    .nav-wordmark { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 0.06em; color: var(--ink); }
+    .nav-wordmark span { color: var(--orange); }
+    .nav-jp { font-family: 'Noto Sans JP', sans-serif; font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: 0.08em; display: block; line-height: 1; }
+    .nav-right { display: flex; align-items: center; gap: 16px; }
+    .nav-link { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--muted); text-decoration: none; letter-spacing: 0.05em; transition: color 0.2s; }
+    .nav-link:hover, .nav-link.active { color: var(--orange); }
+    .nav-cta { display: flex; align-items: center; gap: 8px; background: var(--ink); color: var(--cream); font-family: 'Bebas Neue', sans-serif; font-size: 15px; letter-spacing: 0.08em; padding: 10px 20px; border-radius: 4px; text-decoration: none; border: 2px solid var(--ink); box-shadow: 3px 3px 0 var(--orange); transition: all 0.15s; }
+    .nav-cta:hover { background: var(--orange); color: var(--ink); box-shadow: 3px 3px 0 var(--ink); transform: translate(-1px,-1px); }
+    .nav-cta svg { width: 13px; height: 13px; fill: currentColor; }
+
+    /* PAGE HEADER */
+    .page-header {
+      padding: 140px 48px 60px;
+      background: var(--ink);
+      position: relative;
+      overflow: hidden;
+    }
+    .page-header::after {
+      content: 'キャラクター';
+      position: absolute; top: 50%; right: -20px;
+      transform: translateY(-50%);
+      font-family: 'Noto Sans JP', sans-serif; font-weight: 900; font-size: 140px;
+      color: rgba(247,147,26,0.07); pointer-events: none; white-space: nowrap; line-height: 1;
+    }
+    .page-header-inner { max-width: 1100px; margin: 0 auto; position: relative; z-index: 1; }
+    .page-eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.2em; color: var(--orange); text-transform: uppercase; margin-bottom: 16px; }
+    .page-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(56px, 8vw, 100px); line-height: 0.9; letter-spacing: 0.02em; color: var(--cream); }
+    .page-title span { color: var(--orange); }
+    .page-title-jp { font-family: 'Noto Sans JP', sans-serif; font-weight: 900; font-size: 22px; color: rgba(255,248,238,0.4); letter-spacing: 0.15em; margin-top: 10px; }
+    .page-desc { font-size: 16px; color: rgba(255,248,238,0.55); line-height: 1.7; max-width: 560px; margin-top: 20px; }
+
+    /* TICKER */
+    .ticker { background: var(--orange); border-top: 2px solid var(--ink); border-bottom: 2px solid var(--ink); overflow: hidden; padding: 12px 0; white-space: nowrap; }
+    .ticker-inner { display: inline-flex; gap: 48px; animation: ticker 18s linear infinite; }
+    .ticker-item { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 0.1em; color: var(--ink); display: flex; align-items: center; gap: 16px; }
+    .ticker-item::after { content: '₿'; opacity: 0.4; }
+    @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    /* CHARACTER SECTIONS */
+    .char-section {
+      padding: 100px 48px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .char-section + .char-section { border-top: 2px dashed rgba(247,147,26,0.2); }
+
+    .char-intro {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: start;
+      margin-bottom: 60px;
+    }
+    .char-intro.reverse { direction: rtl; }
+    .char-intro.reverse > * { direction: ltr; }
+
+    .char-main-img {
+      width: 100%;
+      aspect-ratio: 16/10;
+      object-fit: cover;
+      border: 3px solid var(--ink);
+      border-radius: 16px;
+      box-shadow: 8px 8px 0 var(--orange);
+      display: block;
+    }
+
+    .char-info { display: flex; flex-direction: column; justify-content: center; }
+    .char-number { font-family: 'Bebas Neue', sans-serif; font-size: 120px; line-height: 1; color: rgba(247,147,26,0.12); letter-spacing: -0.02em; margin-bottom: -20px; }
+    .char-name { font-family: 'Bebas Neue', sans-serif; font-size: clamp(40px, 5vw, 64px); letter-spacing: 0.02em; line-height: 1; }
+    .char-name-jp { font-family: 'Noto Sans JP', sans-serif; font-size: 15px; font-weight: 700; color: var(--orange); letter-spacing: 0.12em; margin: 8px 0 20px; }
+    .char-role {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--ink); color: var(--cream);
+      font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.12em;
+      padding: 6px 14px; border-radius: 100px; margin-bottom: 20px; width: fit-content;
+    }
+    .char-role-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--orange); }
+    .char-bio { font-size: 15px; line-height: 1.8; color: var(--ink-soft); }
+    .char-quote {
+      margin-top: 24px; padding: 16px 20px;
+      border-left: 4px solid var(--orange);
+      background: rgba(247,147,26,0.06);
+      border-radius: 0 8px 8px 0;
+      font-style: italic; font-size: 14px; line-height: 1.7;
+      color: var(--ink-soft);
+    }
+    .char-quote cite { display: block; margin-top: 8px; font-style: normal; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted); letter-spacing: 0.08em; }
+
+    /* TRAITS */
+    .char-traits { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
+    .trait {
+      background: var(--cream); border: 2px solid var(--ink); border-radius: 100px;
+      padding: 6px 16px; font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+      letter-spacing: 0.08em; color: var(--ink-soft);
+      box-shadow: 2px 2px 0 var(--ink);
+    }
+
+    /* IMAGE GALLERY */
+    .char-gallery { margin-top: 0; }
+    .gallery-label { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 0.05em; margin-bottom: 20px; }
+    .gallery-label span { color: var(--orange); }
+    .gallery-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .gallery-item {
+      border: 2px solid var(--ink); border-radius: 12px; overflow: hidden;
+      box-shadow: 4px 4px 0 var(--ink); transition: transform 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+    }
+    .gallery-item:hover { transform: translate(-2px,-2px); box-shadow: 6px 6px 0 var(--orange); }
+    .gallery-item img { width: 100%; height: 200px; object-fit: cover; display: block; }
+    .gallery-item-cap { background: var(--white); padding: 10px 12px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted); letter-spacing: 0.05em; border-top: 1px solid rgba(0,0,0,0.08); }
+
+    /* DIVIDER */
+    .ink-divider { background: var(--ink); height: 2px; margin: 0; }
+
+    /* BOTH TOGETHER */
+    .together-section {
+      background: var(--ink); padding: 80px 48px; position: relative; overflow: hidden;
+    }
+    .together-section::before { content: '二人'; position: absolute; right: -10px; top: 50%; transform: translateY(-50%); font-family: 'Noto Sans JP', sans-serif; font-weight: 900; font-size: 220px; color: rgba(247,147,26,0.05); pointer-events: none; line-height: 1; }
+    .together-inner { max-width: 1100px; margin: 0 auto; }
+    .together-img { width: 100%; border: 3px solid rgba(247,147,26,0.3); border-radius: 16px; display: block; box-shadow: 8px 8px 0 rgba(247,147,26,0.2); margin-top: 40px; }
+    .together-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(36px, 5vw, 60px); color: var(--cream); }
+    .together-title span { color: var(--orange); }
+    .together-jp { font-family: 'Noto Sans JP', sans-serif; font-size: 13px; font-weight: 700; color: rgba(255,248,238,0.4); letter-spacing: 0.12em; margin-top: 6px; }
+    .together-desc { font-size: 15px; line-height: 1.8; color: rgba(255,248,238,0.55); max-width: 600px; margin-top: 16px; }
+
+    /* CTA BAND */
+    .cta-band { background: var(--orange); border-top: 2px solid var(--ink); border-bottom: 2px solid var(--ink); padding: 64px 48px; display: flex; align-items: center; justify-content: space-between; gap: 32px; flex-wrap: wrap; }
+    .cta-band-left h2 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(36px, 5vw, 64px); letter-spacing: 0.02em; line-height: 1; color: var(--ink); }
+    .cta-band-left p { font-family: 'Noto Sans JP', sans-serif; font-size: 13px; font-weight: 700; color: var(--ink-soft); margin-top: 6px; letter-spacing: 0.08em; opacity: 0.7; }
+    .cta-band-btn { display: inline-flex; align-items: center; gap: 10px; background: var(--ink); color: var(--cream); font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 0.08em; padding: 18px 36px; border-radius: 8px; text-decoration: none; border: 2px solid var(--ink); box-shadow: 5px 5px 0 var(--ink-soft); transition: all 0.15s; white-space: nowrap; }
+    .cta-band-btn:hover { transform: translate(-2px,-2px); box-shadow: 8px 8px 0 var(--ink-soft); }
+    .cta-band-btn svg { width: 18px; height: 18px; fill: currentColor; }
+
+    /* FOOTER */
+    footer { background: var(--ink); padding: 32px 48px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+    .footer-brand { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 0.08em; color: var(--cream); }
+    .footer-brand span { color: var(--orange); }
+    .footer-jp { font-family: 'Noto Sans JP', sans-serif; font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: 0.08em; margin-top: 2px; }
+    .footer-right { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted); letter-spacing: 0.05em; text-align: right; }
+
+    @media (max-width: 768px) {
+      nav { padding: 14px 20px; }
+      .nav-link { display: none; }
+      .page-header { padding: 120px 24px 48px; }
+      .char-section { padding: 60px 24px; }
+      .char-intro { grid-template-columns: 1fr; gap: 32px; }
+      .char-intro.reverse { direction: ltr; }
+      .gallery-grid { grid-template-columns: 1fr 1fr; }
+      .together-section { padding: 60px 24px; }
+      .cta-band { padding: 48px 24px; }
+      footer { padding: 24px 20px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="cursor" id="cursor"></div>
+
+  <nav>
+    <a href="index.html" class="nav-logo">
+      <div class="nav-b">₿</div>
+      <div>
+        <div class="nav-wordmark">Bitcoin <span>Benkyo</span></div>
+        <span class="nav-jp">ビットコイン勉強</span>
+      </div>
+    </a>
+    <div class="nav-right">
+      <a href="characters.html" class="nav-link active">Characters</a>
+      <a href="index.html#learn" class="nav-link">Learn</a>
+      <a href="https://twitter.com/bitcoinbenkyou" target="_blank" rel="noopener" class="nav-cta">
+        <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.747l7.73-8.835L1.254 2.25H8.08l4.259 5.63 5.905-5.63z"/></svg>
+        Follow
+      </a>
+    </div>
+  </nav>
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div class="page-header-inner">
+      <p class="page-eyebrow">Bitcoin Benkyo · ビットコイン勉強</p>
+      <h1 class="page-title">The <span>Guides</span></h1>
+      <p class="page-title-jp">ガイドたちに会う</p>
+      <p class="page-desc">Two characters. Two perspectives. One shared truth about Bitcoin, money, and freedom. Meet the guides who will take you there.</p>
+    </div>
+  </div>
+
+  <!-- TICKER -->
+  <div class="ticker">
+    <div class="ticker-inner">
+      <div class="ticker-item">Mina of Ankoku</div>
+      <div class="ticker-item">暗国のミナ</div>
+      <div class="ticker-item">Sato-san</div>
+      <div class="ticker-item">サトウさん</div>
+      <div class="ticker-item">Two Guides</div>
+      <div class="ticker-item">一つの真実</div>
+      <div class="ticker-item">Mina of Ankoku</div>
+      <div class="ticker-item">暗国のミナ</div>
+      <div class="ticker-item">Sato-san</div>
+      <div class="ticker-item">サトウさん</div>
+      <div class="ticker-item">Two Guides</div>
+      <div class="ticker-item">一つの真実</div>
+    </div>
+  </div>
+
+  <!-- MINA -->
+  <div class="char-section" id="mina">
+    <div class="char-intro">
+      <img src="mina-city.png" alt="Mina of Ankoku overlooking the city" class="char-main-img" />
+      <div class="char-info">
+        <div class="char-number">01</div>
+        <h2 class="char-name">Mina of Ankoku</h2>
+        <p class="char-name-jp">暗国のミナ</p>
+        <div class="char-role"><div class="char-role-dot"></div>The Sharp Guide · 鋭いガイド</div>
+        <p class="char-bio">Born on Ankoku — a hidden island off the coast of Japan. The day before her parents' retirement, a government decree erased their pension. No appeal. No warning. She escaped, but border guards seized everything: cash, jewelry, family heirlooms.<br/><br/>The only thing they couldn't take were the 12 words in her head — her Bitcoin seed phrase. Now she sends sats to her parents every month. She refuses to let them starve under the system.</p>
+        <blockquote class="char-quote">
+          "They called it monetary policy. I call it theft on a timer."
+          <cite>— Mina of Ankoku</cite>
+        </blockquote>
+        <div class="char-traits">
+          <span class="trait">Cool</span>
+          <span class="trait">Sharp</span>
+          <span class="trait">Analytical</span>
+          <span class="trait">Survivor</span>
+          <span class="trait">Bitcoin Maximalist</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="char-gallery">
+      <div class="gallery-label">Mina's <span>Gallery</span></div>
+      <div class="gallery-grid">
+        <div class="gallery-item">
+          <img src="mina-hero.png" alt="Mina portrait" />
+          <div class="gallery-item-cap">City portrait · 都市の肖像</div>
+        </div>
+        <div class="gallery-item">
+          <img src="mina-rooftop.jpg" alt="Mina on rooftop" />
+          <div class="gallery-item-cap">Rooftop view · 屋上の眺め</div>
+        </div>
+        <div class="gallery-item">
+          <img src="mina-studying.png" alt="Mina studying" />
+          <div class="gallery-item-cap">Studying · 勉強中</div>
+        </div>
+        <div class="gallery-item">
+          <img src="mina-sheet1.png" alt="Mina character sheet" />
+          <div class="gallery-item-cap">Character design · キャラクターデザイン</div>
+        </div>
+        <div class="gallery-item">
+          <img src="mina-sheet2.png" alt="Mina character sheet 2" />
+          <div class="gallery-item-cap">Character sheet · キャラクターシート</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ink-divider"></div>
+
+  <!-- SATO -->
+  <div class="char-section" id="sato">
+    <div class="char-intro reverse">
+      <img src="sato-waving.jpg" alt="Sato-san waving" class="char-main-img" />
+      <div class="char-info">
+        <div class="char-number">02</div>
+        <h2 class="char-name">Sato-san</h2>
+        <p class="char-name-jp">サトウさん</p>
+        <div class="char-role"><div class="char-role-dot"></div>The Cheerful Guide · 明るいガイド</div>
+        <p class="char-bio">Raised in an army family, Sato moved country to country throughout his childhood. He witnessed corrupt governments failing their people, currencies collapsing overnight, and protest funds seized without warning.<br/><br/>He discovered Bitcoin as the unseizable fuel for freedom movements — money that no government can freeze, confiscate, or devalue. Warm, friendly, and endlessly patient, he teaches what he wishes he had known sooner.</p>
+        <blockquote class="char-quote">
+          "They didn't take it in one day. They took it slowly, so you wouldn't notice."
+          <cite>— Sato-san</cite>
+        </blockquote>
+        <div class="char-traits">
+          <span class="trait">Warm</span>
+          <span class="trait">Patient</span>
+          <span class="trait">Optimistic</span>
+          <span class="trait">Teacher</span>
+          <span class="trait">Orange Pilled</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="char-gallery">
+      <div class="gallery-label">Sato's <span>Gallery</span></div>
+      <div class="gallery-grid">
+        <div class="gallery-item">
+          <img src="sato-reading.png" alt="Sato reading" />
+          <div class="gallery-item-cap">Reading Broken Money · 読書中</div>
+        </div>
+        <div class="gallery-item">
+          <img src="sato-ramen.png" alt="Sato eating ramen" />
+          <div class="gallery-item-cap">Ramen break · ラーメン休憩</div>
+        </div>
+        <div class="gallery-item">
+          <img src="sato-field.jpg" alt="Sato in the field" />
+          <div class="gallery-item-cap">In the field · 野原で</div>
+        </div>
+        <div class="gallery-item">
+          <img src="sato-sheet1.png" alt="Sato character sheet" />
+          <div class="gallery-item-cap">Character design · キャラクターデザイン</div>
+        </div>
+        <div class="gallery-item">
+          <img src="sato-sheet2.png" alt="Sato character sheet 2" />
+          <div class="gallery-item-cap">Character sheet · キャラクターシート</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOGETHER -->
+  <div class="together-section">
+    <div class="together-inner">
+      <h2 class="together-title">Two Guides.<br/><span>One Truth.</span></h2>
+      <p class="together-jp">二人のガイド、一つの真実</p>
+      <p class="together-desc">Sato and Mina are two sides of the same coin. Sato believes education rebuilds freedom. Mina believes only independence breaks control. They disagree on the path — but they agree on the destination. 21 million. Finished. Forever.</p>
+      <img src="both-studying.png" alt="Mina and Sato studying together" class="together-img" />
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-band">
+    <div class="cta-band-left">
+      <h2>Follow the learning.</h2>
+      <p>毎週新しいストーリー — New stories every week</p>
+    </div>
+    <a href="https://twitter.com/bitcoinbenkyou" target="_blank" rel="noopener" class="cta-band-btn">
+      <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.747l7.73-8.835L1.254 2.25H8.08l4.259 5.63 5.905-5.63z"/></svg>
+      Follow @bitcoinbenkyou
+    </a>
+  </div>
+
+  <footer>
+    <div>
+      <div class="footer-brand">Bitcoin <span>Benkyo</span></div>
+      <div class="footer-jp">ビットコイン勉強 · 21,000,000 · Finished. Forever.</div>
+    </div>
+    <div class="footer-right">
+      © 2025 Bitcoin Benkyo<br/>
+      <span style="color:rgba(138,125,104,0.5)">built on truth · 真実の上に</span>
+    </div>
+  </footer>
+
+  <script>
+    const cursor = document.getElementById('cursor');
+    document.addEventListener('mousemove', e => {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top  = e.clientY + 'px';
+    });
+    document.querySelectorAll('a, button').forEach(el => {
+      el.addEventListener('mouseenter', () => cursor.classList.add('big'));
+      el.addEventListener('mouseleave', () => cursor.classList.remove('big'));
+    });
+  </script>
+</body>
+</html>
